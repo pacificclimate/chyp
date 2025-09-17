@@ -227,12 +227,16 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
         // clear old highlighted upstream and downstream features
         if (stateRef.current.downstreamFeatures.length > 0 && vectorTileLayerRef.current) {
           for (const id of stateRef.current.downstreamFeatures) {
-            vectorTileLayerRef.current.resetFeatureStyle(id);
+            if (id !== properties.uid) {
+              vectorTileLayerRef.current.resetFeatureStyle(id);
+            }
           }
         }
         if (stateRef.current.upstreamFeatures.length > 0 && vectorTileLayerRef.current) {
           for (const id of stateRef.current.upstreamFeatures) {
-            vectorTileLayerRef.current.resetFeatureStyle(id);
+            if (id !== properties.uid) {
+              vectorTileLayerRef.current.resetFeatureStyle(id);
+            }
           }
         }
 
