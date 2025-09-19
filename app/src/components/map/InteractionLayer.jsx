@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import L from "leaflet";
 import "leaflet.vectorgrid";
 import DataSelectionTable from "../data/DataSelectionTable.jsx";
+import { fetchDownstreams, fetchUpstreams } from "../../services/streamNetApi.js";
 
 const InteractionLayer = ({ baseStyles, interactionStyles }) => {
   const stateRef = useRef({
@@ -12,6 +13,8 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
     isPopupOpen: false,
     clickedFeature: null,
     isDragging: false,
+	upstreamFeatures: [],
+	downstreamFeatures: [],
   });
   const vectorTileLayerRef = useRef(null);
   const mapRef = useRef(null);
@@ -39,6 +42,16 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
       if (stateRef.current.hoverHighlight !== stateRef.current.clickedFeature) {
         vectorTileLayerRef.current.resetFeatureStyle(
           stateRef.current.hoverHighlight
+        );
+      }
+      if (stateRef.current.downstreamFeatures.includes(stateRef.current.hoverHighlight)) {
+        vectorTileLayerRef.current.setFeatureStyle(
+          stateRef.current.hoverHighlight, interactionStyles.highlight["downstream"]
+        );
+      }
+      if (stateRef.current.upstreamFeatures.includes(stateRef.current.hoverHighlight)) {
+        vectorTileLayerRef.current.setFeatureStyle(
+          stateRef.current.hoverHighlight, interactionStyles.highlight["upstream"]
         );
       }
       stateRef.current.hoverHighlight = null;
@@ -198,6 +211,46 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
           .setLatLng(event.latlng)
           .setContent("<div style='color: red;'>Failed to fetch GeoJSON</div>")
           .openOn(mapRef.current);
+      }
+
+      // timing on highlighting upstream and downstream features is a little
+      // tricky if the user selects a segment that is included in the 
+      // previously-displayed upstream highlights. In this case,
+      // clearing the "old" upstream highlights can accidentally clear some 
+      // of the "new" downstream highlights if they have already been highlighted. 
+      // Accordingly, both sets of features are cleared and highlighted in tandem.
+      try {
+        // fetch upstream and downstream features
+        const downstreamList = await fetchDownstreams(properties.subid, properties.uid);
+        const upstreamList = await fetchUpstreams(properties.subid, properties.uid);
+
+        // clear old highlighted upstream and downstream features
+        if (stateRef.current.downstreamFeatures.length > 0 && vectorTileLayerRef.current) {
+          for (const id of stateRef.current.downstreamFeatures) {
+            if (id !== properties.uid) {
+              vectorTileLayerRef.current.resetFeatureStyle(id);
+            }
+          }
+        }
+        if (stateRef.current.upstreamFeatures.length > 0 && vectorTileLayerRef.current) {
+          for (const id of stateRef.current.upstreamFeatures) {
+            if (id !== properties.uid) {
+              vectorTileLayerRef.current.resetFeatureStyle(id);
+            }
+          }
+        }
+
+        // highlight new upstream and downstream features
+        stateRef.current.downstreamFeatures = downstreamList;
+        for (const uid of stateRef.current.downstreamFeatures) {
+          vectorTileLayer.setFeatureStyle(uid, interactionStyles.highlight["downstream"]);
+        }
+        stateRef.current.upstreamFeatures = upstreamList;
+        for (const uid of stateRef.current.upstreamFeatures) {
+          vectorTileLayer.setFeatureStyle(uid, interactionStyles.highlight["upstream"]);
+        }
+      } catch (error) {
+        console.error("Error fetching upstream and downstream features:", error);
       }
     };
 

@@ -32,11 +32,25 @@ export const interactionStyles = {
       fillColor: "red",
       fillOpacity: 0.7,
       fill: true,
-    },
+      },
     rivers: {
       weight: 4,
       color: "red",
       opacity: 1,
+      },
+	  downstream: {
+		  weight: 4,
+		  color: "#88419d",
+		  fillColor: "#88419d",
+      fill: true,
+		  opacity: .8,
+	  },
+    upstream: {
+      weight: 4,
+      color: "#8cc0c6",
+      fillColor: "#8cc0c6",
+      fill: true,
+      opacity: .8,
     },
   },
 };
