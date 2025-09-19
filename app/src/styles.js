@@ -43,14 +43,14 @@ export const interactionStyles = {
 		  color: "#88419d",
 		  fillColor: "#88419d",
       fill: true,
-		  opacity: 1,
+		  opacity: .8,
 	  },
     upstream: {
       weight: 4,
-      color: "#8c96c6",
-      fillColor: "#8c96c6",
+      color: "#8cc0c6",
+      fillColor: "#8cc0c6",
       fill: true,
-      opacity:1,
+      opacity: .8,
     },
   },
 };

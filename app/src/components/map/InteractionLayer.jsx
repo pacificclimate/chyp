@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import L from "leaflet";
 import "leaflet.vectorgrid";
 import DataSelectionTable from "../data/DataSelectionTable.jsx";
-import { fetchDownstreams, fetchUpstreams } from "../../services/bbox.js";
+import { fetchDownstreams, fetchUpstreams } from "../../services/streamNetApi.js";
 
 const InteractionLayer = ({ baseStyles, interactionStyles }) => {
   const stateRef = useRef({
