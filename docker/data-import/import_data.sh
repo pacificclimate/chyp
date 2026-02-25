@@ -6,7 +6,15 @@ until pg_isready -d "$DB_DSN"; do
   sleep 1
 done
 
+echo "Dropping existing tables if they exist..."
+psql "$DB_DSN" <<-EOSQL
+  DROP TABLE IF EXISTS rivers CASCADE;
+  DROP TABLE IF EXISTS lakes CASCADE;
+  DROP SEQUENCE IF EXISTS shared_uid_seq CASCADE;
+EOSQL
+
 echo "PostGIS is ready. Importing rivers data..."
+echo "Importing Fraser rivers"
 ogr2ogr \
   -f "PostgreSQL" \
   "PG:$DB_DSN" \
@@ -17,8 +25,22 @@ ogr2ogr \
   -lco FID=fid \
   -a_srs EPSG:3005 \
   -addfields
+  
+echo "Importing BC Coast rivers"
+ogr2ogr \
+  -f "PostgreSQL" \
+  "PG:$DB_DSN" \
+  /data/BC_Coast_3005_rivers.gpkg \
+  -nlt MULTILINESTRING \
+  -nln rivers \
+  -lco GEOMETRY_NAME=geom \
+  -lco FID=fid \
+  -a_srs EPSG:3005 \
+  -append \
+  -addfields
 
 echo "Rivers data imported. Importing lakes data..."
+echo "Importing Fraser lakes"
 ogr2ogr \
   -f "PostgreSQL" \
   "PG:$DB_DSN" \
@@ -28,6 +50,20 @@ ogr2ogr \
   -lco GEOMETRY_NAME=geom \
   -lco FID=fid \
   -a_srs EPSG:3005 \
+  -addfields
+
+
+echo "Importing BC Coast lakes"
+ogr2ogr \
+  -f "PostgreSQL" \
+  "PG:$DB_DSN" \
+  /data/BC_Coast_3005_lakes.gpkg \
+  -nlt MULTIPOLYGON \
+  -nln lakes \
+  -lco GEOMETRY_NAME=geom \
+  -lco FID=fid \
+  -a_srs EPSG:3005 \
+  -append \
   -addfields
 
 echo "Updating tables and adding indices..."
