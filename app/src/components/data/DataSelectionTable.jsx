@@ -4,7 +4,7 @@ import { getAvailableOptions, downloadTimeseries } from "../../services/timeseri
 import "./DataSelection.css";
 
 const DataSelectionTable = ({ featureId, onClose }) => {
-  const outletId = `sub${featureId}`;
+  const outletId = `${featureId}`;
   const [options, setOptions] = useState({
     models: [],
     scenarios: [],
