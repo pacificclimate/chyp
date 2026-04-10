@@ -6,20 +6,24 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
+permissions:
+  contents: read
 jobs:
   publish-images:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
         with:
           username: ${{ secrets.pcicdevops_at_dockerhub_username }}
           password: ${{ secrets.pcicdevops_at_dockerhub_password }}
 
       - name: Build and Publish Demo App
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: docker/app/Dockerfile
@@ -29,7 +33,7 @@ jobs:
             ${{ github.ref_name == 'main' && 'pcic/bbox-demo-app:latest' || '' }}
 
       - name: Build and Publish Data Import
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: docker/data-import/Dockerfile
@@ -39,7 +43,7 @@ jobs:
             ${{ github.ref_name == 'main' && 'pcic/bbox-demo-data-import:latest' || '' }}
 
       - name: Build and Publish PostGIS
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: docker/PostGIS/Dockerfile
@@ -49,7 +53,7 @@ jobs:
             ${{ github.ref_name == 'main' && 'pcic/bbox-demo-postgis:latest' || '' }}
       
       - name: Build and Publish BBOX server
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           context: .
           file: docker/BBOX/Dockerfile
