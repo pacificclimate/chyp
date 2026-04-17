@@ -18,15 +18,15 @@ jobs:
           username: ${{ secrets.pcicdevops_at_dockerhub_username }}
           password: ${{ secrets.pcicdevops_at_dockerhub_password }}
 
-      - name: Build and Publish Demo App
+      - name: Build and Publish App
         uses: docker/build-push-action@v4
         with:
           context: .
           file: docker/app/Dockerfile
           push: true
           tags: |
-            pcic/bbox-demo-app:${{ github.ref_name }}
-            ${{ github.ref_name == 'main' && 'pcic/bbox-demo-app:latest' || '' }}
+            pcic/vhmo-app:${{ github.ref_name }}
+            ${{ github.ref_name == 'main' && 'pcic/vhmo-app:latest' || '' }}
 
       - name: Build and Publish Data Import
         uses: docker/build-push-action@v4
@@ -35,8 +35,8 @@ jobs:
           file: docker/data-import/Dockerfile
           push: true
           tags: |
-            pcic/bbox-demo-data-import:${{ github.ref_name }}
-            ${{ github.ref_name == 'main' && 'pcic/bbox-demo-data-import:latest' || '' }}
+            pcic/vhmo-data-import:${{ github.ref_name }}
+            ${{ github.ref_name == 'main' && 'pcic/vhmo-data-import:latest' || '' }}
 
       - name: Build and Publish PostGIS
         uses: docker/build-push-action@v4
@@ -45,8 +45,8 @@ jobs:
           file: docker/PostGIS/Dockerfile
           push: true
           tags: |
-            pcic/bbox-demo-postgis:${{ github.ref_name }}
-            ${{ github.ref_name == 'main' && 'pcic/bbox-demo-postgis:latest' || '' }}
+            pcic/vhmo-postgis:${{ github.ref_name }}
+            ${{ github.ref_name == 'main' && 'pcic/vhmo-postgis:latest' || '' }}
       
       - name: Build and Publish BBOX server
         uses: docker/build-push-action@v4
@@ -55,5 +55,5 @@ jobs:
           file: docker/BBOX/Dockerfile
           push: true
           tags: |
-            pcic/bbox-demo-server:${{ github.ref_name }}
-            ${{ github.ref_name == 'main' && 'pcic/bbox-demo-server:latest' || '' }}
+            pcic/vhmo-server:${{ github.ref_name }}
+            ${{ github.ref_name == 'main' && 'pcic/vhmo-server:latest' || '' }}
