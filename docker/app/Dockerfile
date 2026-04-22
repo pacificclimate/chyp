@@ -14,10 +14,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-RUN npm install -g http-server
-
 COPY --from=builder /app/dist /app/dist
+COPY ./docker/app/server.js /app/server.js
 
 EXPOSE 8080
 
-CMD ["http-server", "dist", "-p", "8080"]
+CMD ["node", "server.js"]
