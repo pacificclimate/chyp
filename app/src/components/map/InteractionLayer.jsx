@@ -1,10 +1,11 @@
 import { useMapEvents } from "react-leaflet";
-import { useState, useRef, useCallback, useEffect, memo } from "react";
+import { useState, useRef, useCallback, useEffect, memo, lazy, Suspense } from "react";
 import PropTypes from "prop-types";
 import L from "leaflet";
 import "leaflet.vectorgrid";
-import DataSelectionTable from "../data/DataSelectionTable.jsx";
 import { fetchDownstreams, fetchUpstreams } from "../../services/streamNetApi.js";
+
+const DataSelectionTable = lazy(() => import("../data/DataSelectionTable.jsx"));
 
 const InteractionLayer = ({ baseStyles, interactionStyles }) => {
   const stateRef = useRef({
@@ -300,10 +301,12 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
     <>
       {null}
       {showDataTable && selectedSubId && (
-        <DataSelectionTable
-          featureId={selectedSubId}
-          onClose={handleCloseDataTable}
-        />
+        <Suspense fallback={null}>
+          <DataSelectionTable
+            featureId={selectedSubId}
+            onClose={handleCloseDataTable}
+          />
+        </Suspense>
       )}
     </>
   );
