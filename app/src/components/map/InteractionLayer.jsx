@@ -107,8 +107,8 @@ const InteractionLayer = ({ baseStyles, interactionStyles }) => {
         interactive: true,
         getFeatureId: (feature) => feature.properties.uid,
         updateWhenIdle: true,
-        updateWhenZooming: true,
-        keepBuffer: 1,
+        updateWhenZooming: false,
+        keepBuffer: 2,
         preferCanvas: true,
         pane: "interactive", // Use the dedicated pane
         zIndex: 1,
