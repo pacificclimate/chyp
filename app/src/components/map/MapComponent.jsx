@@ -1,11 +1,12 @@
 import { BCBaseMap } from "pcic-react-leaflet-components";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, lazy, Suspense } from "react";
 import InteractionLayer from "./InteractionLayer.jsx";
-import PointPlotter from "./PointPlotter.jsx";
 import LogoBox from "../info/LogoBox.jsx";
-import HelpGuide from "../info/HelpGuide.jsx";
 import FwaNameSearch from "./FwaNameSearch.jsx";
 import { baseStyles, interactionStyles, fwaStyles } from "../../styles.js";
+
+const PointPlotter = lazy(() => import("./PointPlotter.jsx"));
+const HelpGuide = lazy(() => import("../info/HelpGuide.jsx"));
 
 const MapComponent = () => {
   const mapRef = useRef(null);
@@ -66,12 +67,16 @@ const MapComponent = () => {
       markerZoomAnimation={true}
     >
       <LogoBox projectName="Vector Hydrologic Model Output" />
-      <HelpGuide />
+      <Suspense fallback={null}>
+        <HelpGuide />
+      </Suspense>
       <InteractionLayer
         baseStyles={baseStyles}
         interactionStyles={interactionStyles}
       />
-      <PointPlotter map={mapRef} />
+      <Suspense fallback={null}>
+        <PointPlotter map={mapRef} />
+      </Suspense>
       <FwaNameSearch fwaStyles={fwaStyles} />
     </BCBaseMap>
   );
