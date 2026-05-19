@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.webp";
 import "./LogoBox.css";
 
 const LogoBox = ({ projectName }) => {
@@ -10,7 +10,14 @@ const LogoBox = ({ projectName }) => {
 
   return (
     <div className="logo-box">
-      <img src={logo} alt="PCIC Logo" className="logo" />
+      <img
+        src={logo}
+        alt="PCIC Logo"
+        className="logo"
+        width="328"
+        height="38"
+        fetchPriority="high"
+      />
       <div className="project-name-container">
         <h1 className="project-name">
           {firstLine}<br />{secondLine}

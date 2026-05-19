@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMap } from "react-leaflet";
+import PropTypes from "prop-types";
 import L from "leaflet";
 import "./FwaNameSearch.css";
 
@@ -126,6 +127,7 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
   const map = useMap();
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
+  const [indexLoading, setIndexLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(null);
@@ -137,6 +139,7 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
   const abortRef = useRef(null);
   const activeKindRef = useRef(null);
   const containerRef = useRef(null);
+  const indexRequestRef = useRef(null);
 
   const SERVER_ERR =
     "The BC Geographic Warehouse Public webserver is unavailable right now. Please try again later.";
@@ -150,9 +153,26 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
     clearUnderlay();
   };
 
-  useEffect(() => {
-    loadIndex().then(setIndex).catch(console.error);
-  }, []);
+  const ensureIndexLoaded = async () => {
+    if (index) return index;
+    if (!indexRequestRef.current) {
+      setIndexLoading(true);
+      indexRequestRef.current = loadIndex()
+        .then((data) => {
+          setIndex(data);
+          return data;
+        })
+        .catch((e) => {
+          indexRequestRef.current = null;
+          console.error(e);
+          throw e;
+        })
+        .finally(() => {
+          setIndexLoading(false);
+        });
+    }
+    return indexRequestRef.current;
+  };
 
   useEffect(() => {
     ensureUnderlayPane(map);
@@ -344,15 +364,22 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
           placeholder="Search river or lake name…"
           value={q}
           onChange={(e) => {
-            setQ(e.target.value);
+            const nextValue = e.target.value;
+            setQ(nextValue);
             setError("");
-            search(e.target.value);
+            ensureIndexLoaded()
+              .then(() => search(nextValue))
+              .catch(() => {});
           }}
           aria-autocomplete="list"
           aria-expanded={!!results.length}
           aria-controls="fwa-results"
           onFocus={() => {
-            if (q) search(q); // repopulate results when focusing back in
+            ensureIndexLoaded()
+              .then(() => {
+                if (q) search(q); // repopulate results when focusing back in
+              })
+              .catch(() => {});
           }}
         />
         {q && (
@@ -370,7 +397,9 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
             ×
           </button>
         )}
-        {busy && <span className="fwa-spinner" aria-label="Loading" />}
+        {(busy || indexLoading) && (
+          <span className="fwa-spinner" aria-label="Loading" />
+        )}
         {error && (
           <div className="fwa-error" role="alert">
             {error}
@@ -454,3 +483,8 @@ export default function FwaNameSearch({ onPickedFeature, fwaStyles }) {
     </div>
   );
 }
+
+FwaNameSearch.propTypes = {
+  onPickedFeature: PropTypes.func,
+  fwaStyles: PropTypes.object,
+};

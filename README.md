@@ -1,4 +1,4 @@
-# Demo App for BCSRIF-P2
+# Vector Hydrologic Model Output Portal (VHMO) — BCSRIF-P2 
 
 This project provides an interactive web portal for visualizing and downloading hydrological model data, including water temperature, streamflow, and oxygen concentration timeseries.
 
@@ -101,10 +101,10 @@ BC Geographic Warehouse (BCGW) [Public Map Server](https://delivery.maps.gov.bc.
 
 The following images are published to Docker Hub:
 
-- `pcic/bbox-demo-app`: Frontend application
-- `pcic/bbox-demo-data-import`: Data import utilities
-- `pcic/bbox-demo-postgis`: PostGIS database
-- `pcic/bbox-demo-server`: BBOX tile server
+- `pcic/vhmo-app`: Frontend application
+- `pcic/vhmo-data-import`: Data import utilities
+- `pcic/vhmo-postgis`: PostGIS database
+- `pcic/vhmo-server`: BBOX tile server
 
 ## Requirements
 
