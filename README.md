@@ -1,4 +1,4 @@
-# Vector Hydrologic Model Output Portal (VHMO) — BCSRIF-P2 
+# Channel-Scale Hydrologic Model Output Portal (CHYP) — BCSRIF-P2 
 
 This project provides an interactive web portal for visualizing and downloading hydrological model data, including water temperature, streamflow, and oxygen concentration timeseries.
 

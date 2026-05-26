@@ -110,7 +110,7 @@ const fetchLakeMeta = (keys, signal) =>
   );
 
 const loadIndex = async () => {
-  const resp = await fetch(`/vec-hydro-portal/fwa_index.json`);
+  const resp = await fetch(`/chyp/fwa_index.json`);
   if (!resp.ok) throw new Error("Index load failed");
   return resp.json();
 };

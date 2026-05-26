@@ -12,7 +12,7 @@ export default defineConfig({
        "https://swarm.pacificclimate.org/tiles/bc-albers-lite/{z}/{x}/{y}.png",
     }),
   ],
-  base: "/vec-hydro-portal",
+  base: "/chyp",
   // Local Dev only
   server: {
     warmup: {
