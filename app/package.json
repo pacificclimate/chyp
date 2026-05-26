@@ -8,8 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "docker-build": "docker build --file ../docker/app/Dockerfile --tag vec-hydro-portal ../",
-    "docker-run": "docker run --rm -p 3001:8080 vec-hydro-portal"
+    "docker-build": "docker build --file ../docker/app/Dockerfile --tag chyp ../",
+    "docker-run": "docker run --rm -p 3001:8080 chyp"
   },
   "dependencies": {
     "leaflet": "^1.9.4",

@@ -96,19 +96,11 @@ export const downloadTimeseries = async (outletId, selections) => {
 
   if (!timeseriesId) throw new Error("No matching timeseries found");
 
-  const response = await fetch(
-    `${BASE_URL}/outlets/${outletId}/timeseries/${timeseriesId}/data`
-  );
-  if (!response.ok) throw new Error("Failed to fetch data");
-
-  const data = await response.text();
-  const blob = new Blob([data], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
+  const url = `${BASE_URL}/outlets/${outletId}/timeseries/${timeseriesId}/data`;
   const a = document.createElement("a");
   a.href = url;
   a.download = `${outletId}_${selections.model}_${selections.scenario}_${apiVariable}.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
 };

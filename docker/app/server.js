@@ -4,7 +4,7 @@ const path = require("node:path");
 
 const PORT = Number(process.env.PORT || 8080);
 const DIST_DIR = path.join(__dirname, "dist");
-const BASE_PATH = "/vec-hydro-portal";
+const BASE_PATH = "/chyp";
 
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",

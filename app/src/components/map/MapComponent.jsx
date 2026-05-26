@@ -66,7 +66,7 @@ const MapComponent = () => {
       zoomAnimationThreshold={4}
       markerZoomAnimation={true}
     >
-      <LogoBox projectName="Vector Hydrologic Model Output" />
+      <LogoBox projectName="Channel-Scale Hydrologic Model Output Portal" />
       <Suspense fallback={null}>
         <HelpGuide />
       </Suspense>
