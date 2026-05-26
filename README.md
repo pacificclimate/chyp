@@ -1,4 +1,4 @@
-# Channel-Scale Hydrologic Model Output Portal (CHYP) — BCSRIF-P2 
+# Channel-Scale Hydrologic Model Output Portal (CHYP) — BCSRIF-P2
 
 This project provides an interactive web portal for visualizing and downloading hydrological model data, including water temperature, streamflow, and oxygen concentration timeseries.
 
@@ -101,10 +101,10 @@ BC Geographic Warehouse (BCGW) [Public Map Server](https://delivery.maps.gov.bc.
 
 The following images are published to Docker Hub:
 
-- `pcic/vhmo-app`: Frontend application
-- `pcic/vhmo-data-import`: Data import utilities
-- `pcic/vhmo-postgis`: PostGIS database
-- `pcic/vhmo-server`: BBOX tile server
+- `pcic/chyp-app`: Frontend application
+- `pcic/chyp-data-import`: Data import utilities
+- `pcic/chyp-postgis`: PostGIS database
+- `pcic/chyp-server`: BBOX tile server
 
 ## Requirements
 
