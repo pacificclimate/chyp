@@ -1,7 +1,9 @@
-import { BCBaseMap } from "pcic-react-leaflet-components";
+import { BCBaseMap, EEZLayer } from "pcic-react-leaflet-components";
 
 const runtimeTileUrl =
   globalThis.__CHYP_CONFIG__?.REACT_APP_BC_BASE_MAP_TILES_URL?.trim();
+export const eezUrl =
+  globalThis.__CHYP_CONFIG__?.REACT_APP_EEZ_GEOJSON_URL?.trim();
 
 export const baseMapTileUrl = runtimeTileUrl || BCBaseMap.tileset.url;
 
@@ -50,4 +52,4 @@ export const configureBaseMapResourceHints = () => {
   });
 };
 
-export { BCBaseMap };
+export { BCBaseMap, EEZLayer };
