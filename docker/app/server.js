@@ -164,9 +164,15 @@ const getRuntimeConfigAssignment = () => {
   const tileUrl = (
     process.env.REACT_APP_BC_BASE_MAP_TILES_URL || ""
   ).trim();
-  const config = tileUrl
-    ? { REACT_APP_BC_BASE_MAP_TILES_URL: tileUrl }
-    : {};
+  const eezGeojsonUrl = (process.env.REACT_APP_EEZ_GEOJSON_URL || "").trim();
+  const config = {};
+
+  if (tileUrl) {
+    config.REACT_APP_BC_BASE_MAP_TILES_URL = tileUrl;
+  }
+  if (eezGeojsonUrl) {
+    config.REACT_APP_EEZ_GEOJSON_URL = eezGeojsonUrl;
+  }
 
   const serializedConfig = JSON.stringify(config).replaceAll("<", "\\u003c");
   return `window.__CHYP_CONFIG__ = ${serializedConfig};`;

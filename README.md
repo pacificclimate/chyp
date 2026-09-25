@@ -102,7 +102,9 @@ BC Geographic Warehouse (BCGW) [Public Map Server](https://delivery.maps.gov.bc.
   production PNG tiles on `services.pacificclimate.org`). The app container
   reads this variable when it starts, so non-production deployments can use a
   different tile server and format without rebuilding the image.
-
+- `REACT_APP_EEZ_GEOJSON_URL`: BC-only EEZ-boundary GeoJSON URL. It defaults
+  to `eez_boundaries_bc_v12.geojson` on the EEZ tile server. The Canada-wide
+  source remains available on that server as `eez_boundaries_canada_v12.geojson`.
 ## Docker Images
 
 The following images are published to Docker Hub:

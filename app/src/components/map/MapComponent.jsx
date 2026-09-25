@@ -1,4 +1,9 @@
-import { BCBaseMap, baseMapTileUrl } from "../../baseMapConfig.js";
+import {
+  BCBaseMap,
+  EEZLayer,
+  baseMapTileUrl,
+  eezUrl,
+} from "../../baseMapConfig.js";
 import { useRef, useEffect, lazy, Suspense } from "react";
 import InteractionLayer from "./InteractionLayer.jsx";
 import LogoBox from "../info/LogoBox.jsx";
@@ -20,7 +25,7 @@ const MapComponent = () => {
     [75, -50],
   ];
   const maxZoomLevel = 13;
-  const minZoomLevel = 5;
+  const minZoomLevel = 6;
 
   useEffect(() => {
     if (mapRef.current) {
@@ -68,6 +73,7 @@ const MapComponent = () => {
       zoomAnimationThreshold={4}
       markerZoomAnimation={true}
     >
+      <EEZLayer url={eezUrl} />
       <LogoBox projectName="Channel-Scale Hydrologic Model Output Portal" />
       <Suspense fallback={null}>
         <HelpGuide />
