@@ -1,5 +1,11 @@
 # Release Notes
 
+## 2.4.0
+
+_25-Sep-2026_
+
+- Add BC EEZ, tune viewport (#47)
+
 ## 2.3.0
 
 _04-Sep-2026_
