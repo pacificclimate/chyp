@@ -8,7 +8,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl \
         gettext-base \
-        postgresql-client && \
+        postgresql-client \
+        libbrotli1 \
+        python3-brotli && \
     rm -rf /var/lib/apt/lists/*
 
 COPY docker/BBOX/start-bbox-server.sh /usr/local/bin/start-bbox-server.sh
