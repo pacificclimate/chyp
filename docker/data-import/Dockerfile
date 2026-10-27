@@ -1,7 +1,8 @@
-FROM osgeo/gdal:alpine-small-3.6.3
+FROM ghcr.io/osgeo/gdal:alpine-small-3.13.3
 
-# Install PostgreSQL client tools and PostGIS
-RUN apk add --no-cache postgresql-client postgis
+# PostGIS runs on the database server; the importer only needs its client tools.
+RUN apk upgrade --no-cache \
+    && apk add --no-cache postgresql-client
 
 # Copy cleanup and import script
 COPY docker/data-import/import_data.sh /usr/local/bin/import_data.sh
