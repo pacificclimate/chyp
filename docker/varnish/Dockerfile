@@ -3,6 +3,7 @@ FROM varnish:7.5.0
 USER root
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
