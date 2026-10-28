@@ -1,4 +1,4 @@
-FROM wodby/vinyl:9.1.0-r8@sha256:37bc64bbb92175b9fa6dfabec6ab1872262b778d200eeea17f586adf8987a8c8
+FROM wodby/vinyl:9.1.0-r9@sha256:ed50db5bf4f4bba4a6e470782e6ccc833fa6c84a6857bb8e1d1d7f434fef7501
 
 USER root
 
