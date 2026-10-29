@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2.4.1
+
+_29-Oct-2026_
+
+- Upgrade Brotli packages (#52)
+- Bump Docker-in-Docker devcontainer feature to 4.1.3 (#50)
+
 ## 2.4.0
 
 _25-Sep-2026_
