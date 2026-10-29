@@ -1,3 +1,4 @@
+```sh
 #!/bin/sh
 set -e
 
@@ -172,20 +173,56 @@ import_dataset Okanagan_3005_lakes.gpkg MULTIPOLYGON lakes_next -append
 
 echo "Updating tables and adding indices..."
 psql "$DB_DSN" -v ON_ERROR_STOP=1 <<-EOSQL
-  CREATE TEMP SEQUENCE chyp_uid_seq START 1;
+  ALTER TABLE rivers_next ADD COLUMN uid INT;
+  ALTER TABLE rivers_next ADD COLUMN islake BOOLEAN DEFAULT FALSE;
 
-  ALTER TABLE rivers_next ADD COLUMN Uid INT;
-  ALTER TABLE rivers_next ADD COLUMN IsLake BOOLEAN DEFAULT FALSE;
-  UPDATE rivers_next SET uid = nextval('chyp_uid_seq');
+  ALTER TABLE lakes_next ADD COLUMN uid INT;
+  ALTER TABLE lakes_next ADD COLUMN islake BOOLEAN DEFAULT TRUE;
 
-  ALTER TABLE lakes_next ADD COLUMN Uid INT;
-  ALTER TABLE lakes_next ADD COLUMN IsLake BOOLEAN DEFAULT TRUE;
-  UPDATE lakes_next SET uid = nextval('chyp_uid_seq');
+  -- subid must be globally unique because it defines the deterministic UID.
+  DO \$\$
+  BEGIN
+    IF EXISTS (
+      SELECT subid
+      FROM (
+        SELECT subid FROM rivers_next
+        UNION ALL
+        SELECT subid FROM lakes_next
+      ) AS all_features
+      GROUP BY subid
+      HAVING count(*) > 1
+    ) THEN
+      RAISE EXCEPTION 'Duplicate subid detected across rivers_next and lakes_next';
+    END IF;
+  END
+  \$\$;
+
+  -- Deterministic UID assignment across rivers and lakes.
+  CREATE TEMP TABLE chyp_uid_map AS
+  SELECT
+    subid,
+    row_number() OVER (ORDER BY subid)::INT AS uid
+  FROM (
+    SELECT subid FROM rivers_next
+    UNION ALL
+    SELECT subid FROM lakes_next
+  ) AS all_features;
+
+  UPDATE rivers_next AS r
+  SET uid = m.uid
+  FROM chyp_uid_map AS m
+  WHERE r.subid = m.subid;
+
+  UPDATE lakes_next AS l
+  SET uid = m.uid
+  FROM chyp_uid_map AS m
+  WHERE l.subid = m.subid;
 
   CREATE INDEX rivers_next_geom_idx ON rivers_next USING GIST(geom);
   CREATE INDEX lakes_next_geom_idx ON lakes_next USING GIST(geom);
   CREATE INDEX rivers_next_subid_idx ON rivers_next(subid);
   CREATE INDEX lakes_next_subid_idx ON lakes_next(subid);
+
   VACUUM ANALYZE rivers_next;
   VACUUM ANALYZE lakes_next;
 EOSQL
@@ -200,22 +237,27 @@ psql "$DB_DSN" -v ON_ERROR_STOP=1 <<-EOSQL
       SELECT subid, dowsubid, uid FROM rivers_next
     )
 
-      SELECT subid, dowsubid, uid, subid AS mouth
-      FROM segments
+    SELECT subid, dowsubid, uid, subid AS mouth
+    FROM segments
 
-      UNION ALL
+    UNION ALL
 
-      SELECT segments.subid, segments.dowsubid, segments.uid, drainage.mouth
-      FROM drainage, segments
-      WHERE drainage.subid = segments.dowsubid)
+    SELECT segments.subid, segments.dowsubid, segments.uid, drainage.mouth
+    FROM drainage, segments
+    WHERE drainage.subid = segments.dowsubid
+  )
 
-  SELECT mouth AS subid, 
+  SELECT
+    mouth AS subid,
     array_agg(uid) AS upstream_uids,
     array_agg(subid) AS upstream_subids,
-    ST_AsGeoJSON(ST_SetSRID(ST_Point(52.628, -118.430, 4326), 3005)) AS origin 
-  FROM drainage GROUP BY mouth;
+    ST_AsGeoJSON(
+      ST_SetSRID(ST_Point(52.628, -118.430, 4326), 3005)
+    ) AS origin
+  FROM drainage
+  GROUP BY mouth;
 
-CREATE MATERIALIZED VIEW downstreams_next AS
+  CREATE MATERIALIZED VIEW downstreams_next AS
   WITH RECURSIVE course(subid, downsubid, uid, origin) AS (
     WITH segments(subid, dowsubid, uid) AS (
       SELECT subid, dowsubid, uid FROM lakes_next
@@ -223,22 +265,29 @@ CREATE MATERIALIZED VIEW downstreams_next AS
       SELECT subid, dowsubid, uid FROM rivers_next
     )
 
-      SELECT subid, dowsubid, uid, subid AS origin
-      FROM segments
+    SELECT subid, dowsubid, uid, subid AS origin
+    FROM segments
 
-      UNION ALL
+    UNION ALL
 
-      SELECT segments.subid, segments.dowsubid, segments.uid, course.origin
-      FROM course, segments
-      WHERE course.downsubid = segments.subid)
-  SELECT origin AS subid,
+    SELECT segments.subid, segments.dowsubid, segments.uid, course.origin
+    FROM course, segments
+    WHERE course.downsubid = segments.subid
+  )
+
+  SELECT
+    origin AS subid,
     array_agg(uid) AS downstream_uids,
     array_agg(subid) AS downstream_subids,
-    ST_AsGeoJSON(ST_SetSRID(ST_Point(49.1778, -123.241, 4326), 3005)) AS mouth
-  FROM course GROUP BY origin;
+    ST_AsGeoJSON(
+      ST_SetSRID(ST_Point(49.1778, -123.241, 4326), 3005)
+    ) AS mouth
+  FROM course
+  GROUP BY origin;
 
-  CREATE INDEX upstreams_next_uid_idx ON upstreams_next(subid);
-  CREATE INDEX downstreams_next_uid_idx ON downstreams_next(subid);
+  CREATE INDEX upstreams_next_subid_idx ON upstreams_next(subid);
+  CREATE INDEX downstreams_next_subid_idx ON downstreams_next(subid);
+
   VACUUM ANALYZE upstreams_next;
   VACUUM ANALYZE downstreams_next;
 EOSQL
@@ -259,12 +308,15 @@ psql "$DB_DSN" \
     IF to_regclass('public.rivers') IS NOT NULL THEN
       EXECUTE 'ALTER TABLE public.rivers RENAME TO rivers_old';
     END IF;
+
     IF to_regclass('public.lakes') IS NOT NULL THEN
       EXECUTE 'ALTER TABLE public.lakes RENAME TO lakes_old';
     END IF;
+
     IF to_regclass('public.upstreams') IS NOT NULL THEN
       EXECUTE 'ALTER MATERIALIZED VIEW public.upstreams RENAME TO upstreams_old';
     END IF;
+
     IF to_regclass('public.downstreams') IS NOT NULL THEN
       EXECUTE 'ALTER MATERIALIZED VIEW public.downstreams RENAME TO downstreams_old';
     END IF;
@@ -279,14 +331,13 @@ psql "$DB_DSN" \
   DROP MATERIALIZED VIEW IF EXISTS downstreams_old;
   DROP TABLE IF EXISTS rivers_old CASCADE;
   DROP TABLE IF EXISTS lakes_old CASCADE;
-  DROP SEQUENCE IF EXISTS shared_uid_seq;
 
   ALTER INDEX rivers_next_geom_idx RENAME TO rivers_geom_idx;
   ALTER INDEX lakes_next_geom_idx RENAME TO lakes_geom_idx;
   ALTER INDEX rivers_next_subid_idx RENAME TO rivers_subid_idx;
   ALTER INDEX lakes_next_subid_idx RENAME TO lakes_subid_idx;
-  ALTER INDEX upstreams_next_uid_idx RENAME TO upstream_uid_idx;
-  ALTER INDEX downstreams_next_uid_idx RENAME TO downstream_uid_idx;
+  ALTER INDEX upstreams_next_subid_idx RENAME TO upstream_subid_idx;
+  ALTER INDEX downstreams_next_subid_idx RENAME TO downstream_subid_idx;
 
   UPDATE chyp_import_status
   SET status = 'ready',
@@ -300,3 +351,4 @@ EOSQL
 
 trap - EXIT
 echo "Data import ${CHYP_IMPORT_ID} complete."
+```
