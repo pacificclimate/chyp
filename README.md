@@ -113,7 +113,14 @@ The following images are published to Docker Hub:
 - `pcic/chyp-data-import`: Data import utilities
 - `pcic/chyp-postgis`: PostGIS database
 - `pcic/chyp-server`: BBOX tile server
-- `pcic/chyp-varnish`: BBOX tile cache with an upstream readiness check
+- `pcic/chyp-varnish`: BBOX tile cache with an upstream readiness check, based on
+  digest-pinned `wodby/vinyl:9.1.0-r8` (Vinyl Cache 9.1.0). Uses a VCL mounted at
+  `/etc/varnish/default.vcl`, listens on port 80, and stores its file cache at
+  `/var/lib/varnish/cache.bin`.
+
+The cache runs as UID/GID `1000:1000`. Its cache volume must be writable by this
+user, and its mounted VCL must be readable. CHYP starts the daemon directly
+using the mounted VCL. Responses include the `X-Vinyl` cache header.
 
 ## Requirements
 

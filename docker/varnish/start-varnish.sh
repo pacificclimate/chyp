@@ -18,6 +18,6 @@ until curl --fail --silent --show-error --max-time 5 "$READY_URL" >/dev/null; do
   sleep "$RETRY_SECONDS"
 done
 
-echo "BBOX server is ready. Starting Varnish."
+echo "BBOX server is ready. Starting Vinyl Cache."
 rm -f /var/lib/varnish/cache.bin
 exec varnishd "$@"
